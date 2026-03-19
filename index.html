@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Presupuesto Marmolería</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Roboto',sans-serif; background:#f5f5f5; color:#333; margin:20px; }
+  h1,h3,h4 { color:#222; margin:0; }
+  img.logo { height:60px; display:block; margin-bottom:10px; }
+
+  /* Encabezado */
+  .header { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:15px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:15px;}
+  .empresa { font-size:0.9em; }
+  .cliente { font-size:0.9em; text-align:right; }
+
+  /* Piezas y entradas */
+  .pieza { background:#fff; border-radius:6px; padding:15px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+  input { padding:5px; border-radius:4px; border:1px solid #ccc; margin-bottom:5px; width:100px; }
+
+  button { padding:8px 12px; border-radius:5px; background:#007BFF; color:white; border:none; cursor:pointer; margin-top:5px;}
+  button:hover { background:#0056b3; }
+
+  /* Tabla de resultados estilo presupuesto */
+  #resultado { margin-top:15px; background:#fff; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1); overflow:hidden;}
+  .fila { display:grid; grid-template-columns:2fr 1fr; padding:8px 10px; border-bottom:1px solid #ccc; }
+  .fila:nth-child(even):not(.totales) { background:#f9f9f9; }
+  .fila.totales { background:#e0e0e0; font-weight:bold; font-size:1.1em; text-transform:uppercase; }
+  .fila span { display:block; }
+
+  /* Notas */
+  .notas { margin-top:15px; font-size:0.85em; color:#555; background:#fff; padding:15px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+</style>
+</head>
+<body>
+
+<!-- Encabezado -->
+<div class="header">
+  <img src="logo.png" alt="Logo Marmolería" class="logo">
+  <div class="empresa">
+    ALTASTONE MARMOLES Y GRANITOS<br>
+    altastonemarmolesygranitos@gmail.com<br>
+    +54 9 11 6201 1638<br>
+    N.º de presupuesto: 100-00357<br>
+    Fecha: 18/03/2026
+  </div>
+  <div class="cliente">
+    Nombre: <input type="text" id="clienteNombre"><br>
+    Dirección: <input type="text" id="clienteDireccion"><br>
+    Comentarios: <input type="text" id="clienteComentarios" style="width:200px;">
+  </div>
+</div>
+
+<h1>Presupuesto</h1>
+
+<h3>Precio por m² (USD)</h3>
+<input type="number" id="precioM2" placeholder="Precio por m²">
+
+<!-- Piezas -->
+<div class="pieza" id="cocina">
+  <h3>Cocina</h3>
+  <div class="secciones" id="cocina-secciones"></div>
+  <button onclick="agregarSeccion('cocina','cocina')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="isla">
+  <h3>Isla</h3>
+  <div class="secciones" id="isla-secciones"></div>
+  <button onclick="agregarSeccion('isla','isla')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="lavadero">
+  <h3>Lavadero</h3>
+  <div class="secciones" id="lavadero-secciones"></div>
+  <button onclick="agregarSeccion('lavadero','lavadero')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="bano">
+  <h3>Baño</h3>
+  <div class="secciones" id="bano-secciones"></div>
+  <button onclick="agregarSeccion('bano','bano')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="espacio_extra">
+  <h3>Espacio Extra</h3>
+  <div class="secciones" id="espacio_extra-secciones"></div>
+  <button onclick="agregarEspacioExtra()">Agregar espacio</button>
+</div>
+
+<!-- Trafóros -->
+<div class="pieza">
+  <h3>Trafóros</h3>
+  Grifería: <input type="number" id="grif"><br>
+  Bacha: <input type="number" id="bacha"><br>
+  Anafe: <input type="number" id="anafe"><br>
+</div>
+
+<!-- Descuento -->
+<div class="pieza">
+  <h3>Descuento</h3>
+  %: <input type="number" id="descuentoPorc" style="width:60px;">
+  Manual $: <input type="number" id="descuentoManual" style="width:80px;"><br>
+</div>
+
+<button onclick="calcular()">Calcular</button>
+
+<!-- Resultado -->
+<div id="resultado"></div>
+
+<!-- Notas al pie -->
+<div class="notas">
+  <p>1. Impuestos y moneda: Este presupuesto no incluye IVA. El presupuesto está expresado en dólares estadounidenses. TC BNA.</p>
+  <p>2. Condiciones de pago: Se requiere un anticipo del 70%. Los saldos de materiales nacionales deberán abonarse previo a la instalación.</p>
+  <p>3. Medición y colocación: Los servicios de medición y colocación no incluyen subidas por escaleras, las cuales se cotizan por separado.</p>
+  <p>4. Instalación y condiciones del lugar: La base donde se instale el producto deberá estar en óptimas condiciones y el día de la medición deberá estar presente un responsable.</p>
+  <p>5. Detalles técnicos y diseño: La ubicación de los cortes en las piezas se definirá durante la medición técnica en obra.</p>
+  <p>6. Tiempos de fabricación: Serán los vigentes al momento de realizar la medición técnica en obra.</p>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
