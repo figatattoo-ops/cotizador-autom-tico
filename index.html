@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Presupuesto Marmolería</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family:'Roboto',sans-serif; background:#f9f9f9; color:#333; margin:20px; }
+  h1,h3,h4 { margin:0; }
+  img.logo { height:60px; display:block; }
+
+  /* Encabezado estilo PDF */
+  .header { display:flex; justify-content:space-between; align-items:flex-start; background:#fff; padding:15px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.1); margin-bottom:20px;}
+  .empresa { font-size:0.9em; line-height:1.4; }
+  .cliente { font-size:0.9em; text-align:right; line-height:1.4; }
+
+  input { padding:4px 6px; border-radius:3px; border:1px solid #ccc; margin-bottom:5px; width:100px; }
+
+  button { padding:6px 10px; border-radius:5px; background:#007BFF; color:white; border:none; cursor:pointer; margin-top:5px;}
+  button:hover { background:#0056b3; }
+
+  .pieza { background:#fff; border-radius:6px; padding:15px; margin-bottom:15px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+
+  /* Resultado tipo planilla PDF */
+  #resultado { margin-top:20px; background:#fff; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.08); overflow:hidden; font-size:0.95em;}
+  .fila { display:grid; grid-template-columns:2fr 1fr; padding:8px 12px; border-bottom:1px solid #ddd; align-items:center; }
+  .fila:nth-child(even):not(.totales) { background:#f2f2f2; }
+  .fila.totales { background:#d9edf7; font-weight:bold; text-transform:uppercase; font-size:1em; }
+  .fila span { display:block; }
+
+  /* Notas pie */
+  .notas { margin-top:20px; font-size:0.85em; color:#555; background:#fff; padding:15px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+
+  /* Secciones internas */
+  .seccion { margin-bottom:10px; border:1px solid #ccc; padding:8px; border-radius:4px; }
+  .seccion h4 { font-size:1em; margin-bottom:5px; }
+  .seccion input { width:80px; margin-right:5px; }
+</style>
+</head>
+<body>
+
+<!-- Encabezado -->
+<div class="header">
+  <img src="logo.png" alt="Logo Marmolería" class="logo">
+  <div class="empresa">
+    ALTASTONE MARMOLES Y GRANITOS<br>
+    altastonemarmolesygranitos@gmail.com<br>
+    +54 9 11 6201 1638<br>
+    N.º de presupuesto: 100-00357<br>
+    Fecha: 18/03/2026
+  </div>
+  <div class="cliente">
+    Nombre: <input type="text" id="clienteNombre"><br>
+    Dirección: <input type="text" id="clienteDireccion"><br>
+    Comentarios: <input type="text" id="clienteComentarios" style="width:200px;">
+  </div>
+</div>
+
+<h1>Presupuesto</h1>
+<h3>Precio por m² (USD)</h3>
+<input type="number" id="precioM2" placeholder="Precio por m²">
+
+<!-- Piezas -->
+<div class="pieza" id="cocina">
+  <h3>Cocina</h3>
+  <div class="secciones" id="cocina-secciones"></div>
+  <button onclick="agregarSeccion('cocina','cocina')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="isla">
+  <h3>Isla</h3>
+  <div class="secciones" id="isla-secciones"></div>
+  <button onclick="agregarSeccion('isla','isla')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="lavadero">
+  <h3>Lavadero</h3>
+  <div class="secciones" id="lavadero-secciones"></div>
+  <button onclick="agregarSeccion('lavadero','lavadero')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="bano">
+  <h3>Baño</h3>
+  <div class="secciones" id="bano-secciones"></div>
+  <button onclick="agregarSeccion('bano','bano')">Agregar sección</button>
+</div>
+
+<div class="pieza" id="espacio_extra">
+  <h3>Espacio Extra</h3>
+  <div class="secciones" id="espacio_extra-secciones"></div>
+  <button onclick="agregarEspacioExtra()">Agregar espacio</button>
+</div>
+
+<!-- Trafóros -->
+<div class="pieza">
+  <h3>Trafóros</h3>
+  Grifería: <input type="number" id="grif"><br>
+  Bacha: <input type="number" id="bacha"><br>
+  Anafe: <input type="number" id="anafe"><br>
+</div>
+
+<!-- Descuento -->
+<div class="pieza">
+  <h3>Descuento</h3>
+  %: <input type="number" id="descuentoPorc" style="width:60px;">
+  Manual $: <input type="number" id="descuentoManual" style="width:80px;"><br>
+</div>
+
+<button onclick="calcular()">Calcular</button>
+
+<!-- Resultado -->
+<div id="resultado"></div>
+
+<!-- Notas al pie -->
+<div class="notas">
+  <p>1. Impuestos y moneda: Este presupuesto no incluye IVA. El presupuesto está expresado en dólares estadounidenses. TC BNA.</p>
+  <p>2. Condiciones de pago: Se requiere un anticipo del 70%. Los saldos de materiales nacionales deberán abonarse previo a la instalación.</p>
+  <p>3. Medición y colocación: Los servicios de medición y colocación no incluyen subidas por escaleras, las cuales se cotizan por separado.</p>
+  <p>4. Instalación y condiciones del lugar: La base donde se instale el producto deberá estar en óptimas condiciones y el día de la medición deberá estar presente un responsable.</p>
+  <p>5. Detalles técnicos y diseño: La ubicación de los cortes en las piezas se definirá durante la medición técnica en obra.</p>
+  <p>6. Tiempos de fabricación: Serán los vigentes al momento de realizar la medición técnica en obra.</p>
+</div>
+
+<script>
+let traforosPrecios = { grif: 20, bacha: 40, anafe: 40 };
+
+function agregarSeccion(piezaId, tipo, esExtra=false){
+  const contenedor = document.getElementById(piezaId+'-secciones');
+  const index = contenedor.children.length+1;
+  let extras = '';
+
+  if(tipo==='isla'||esExtra){
+    extras+=`
+      Pata Ancho: <input type="number" class="pata_ancho" placeholder="Ancho" readonly>
+      Pata Alto: <input type="number" class="pata_alto" placeholder="Alto"><br>
+      Rivuelta Ancho: <input type="number" class="rivuleta_ancho" placeholder="Ancho">
+      Rivuelta Alto: <input type="number" class="rivuleta_alto" placeholder="Alto" readonly><br>
+    `;
+  }
+
+  if(tipo==='cocina'||tipo==='lavadero'||esExtra){
+    extras+=`
+      Alzada Largo: <input type="number" class="alzada_largo" placeholder="Largo">
+      Alzada Ancho: <input type="number" class="alzada_ancho" placeholder="Ancho"><br>
+    `;
+  }
+
+  if(tipo==='bano'||esExtra){
+    extras+=`Bacha integrada: <input type="number" class="bacha_int" placeholder="Cantidad"><br>`;
+  }
+
+  let zocalosOpciones = ['fondo','izq','der'];
+  let regruesosOpciones = ['frente','izq','der'];
+  if(tipo==='isla'){ zocalosOpciones=['frente','fondo','izq','der']; regruesosOpciones=['frente','fondo','izq','der']; }
+
+  const zocalosHTML = zocalosOpciones.map(l=>`${l.charAt(0).toUpperCase()+l.slice(1)} <input type="checkbox" class="zocalo_${l}">`).join(' ');
+  const regruesosHTML = regruesosOpciones.map(l=>`${l.charAt(0).toUpperCase()+l.slice(1)} <input type="checkbox" class="regrueso_${l}">`).join(' ');
+
+  const html = `
+    <div class="seccion">
+      <h4>Sección ${index}</h4>
+      Largo: <input type="number" class="largo">
+      Ancho: <input type="number" class="ancho"><br>
+      Zócalos: ${zocalosHTML}<br>
+      Regruesos: ${regruesosHTML}<br>
+      ${extras}
+    </div>
+  `;
+  const div = document.createElement('div');
+  div.innerHTML=html;
+  contenedor.appendChild(div.firstElementChild);
+}
+
+function agregarEspacioExtra(){ agregarSeccion('espacio_extra','extra',true); }
+
+function calcular(){
+  let total=0;
+  const precioM2=parseFloat(document.getElementById('precioM2')?.value||0);
+
+  const piezas=[
+    {id:'cocina',tipo:'cocina'},
+    {id:'isla',tipo:'isla'},
+    {id:'lavadero',tipo:'lavadero'},
+    {id:'bano',tipo:'bano'},
+    {id:'espacio_extra',tipo:'extra'}
+  ];
+
+  piezas.forEach(p=>{
+    const contenedor=document.getElementById(p.id+'-secciones');
+    if(!contenedor) return;
+
+    const secciones=contenedor.getElementsByClassName('seccion');
+    for(let sec of secciones){
+      const largo=parseFloat(sec.querySelector('.largo')?.value||0);
+      const ancho=parseFloat(sec.querySelector('.ancho')?.value||0);
+      let subtotalSeccion=largo*ancho*precioM2;
+
+      const zocalos = Array.from(sec.querySelectorAll('[class^="zocalo_"]')).reduce((sum,el)=>sum+(el.checked?1:0),0);
+      subtotalSeccion+= zocalos*0.1*largo*ancho*precioM2;
+
+      const regruesos = Array.from(sec.querySelectorAll('[class^="regrueso_"]')).reduce((sum,el)=>sum+(el.checked?1:0),0);
+      subtotalSeccion+= regruesos*0.2*largo*ancho*precioM2;
+
+      const esExtra=p.tipo==='extra';
+
+      if(p.tipo==='isla'||esExtra){
+        const altoPata=parseFloat(sec.querySelector('.pata_alto')?.value||0);
+        sec.querySelector('.pata_ancho').value=ancho;
+        subtotalSeccion+=(ancho*altoPata/10000)*precioM2;
+
+        const rivueltaAncho=parseFloat(sec.querySelector('.rivuleta_ancho')?.value||0);
+        sec.querySelector('.rivuleta_alto').value=altoPata;
+        subtotalSeccion+=(rivueltaAncho*altoPata/10000)*precioM2;
+      }
+
+      if(p.tipo==='bano'||esExtra){
+        const bachaInt=parseFloat(sec.querySelector('.bacha_int')?.value||0);
+        subtotalSeccion+= bachaInt*precioM2;
+      }
+
+      if(p.tipo==='cocina'||p.tipo==='lavadero'||esExtra){
+        const alzadaLargo=parseFloat(sec.querySelector('.alzada_largo')?.value||0);
+        const alzadaAncho=parseFloat(sec.querySelector('.alzada_ancho')?.value||0);
+        subtotalSeccion+= alzadaLargo*alzadaAncho*precioM2;
+      }
+
+      total+=subtotalSeccion;
+    }
+  });
+
+  const traforosTotal = 
+    (parseFloat(document.getElementById('grif')?.value||0)*traforosPrecios.grif)+
+    (parseFloat(document.getElementById('bacha')?.value||0)*traforosPrecios.bacha)+
+    (parseFloat(document.getElementById('anafe')?.value||0)*traforosPrecios.anafe);
+
+  total+= traforosTotal;
+
+  let flete=Math.max(total*0.15,400);
+  let totalFinal=total+flete;
+
+  const descuentoPorc=parseFloat(document.getElementById('descuentoPorc')?.value||0);
+  const descuentoManual=parseFloat(document.getElementById('descuentoManual')?.value||0);
+  let descuentoAplicado=0;
+  if(descuentoManual>0) descuentoAplicado=descuentoManual;
+  else if(descuentoPorc>0) descuentoAplicado=totalFinal*(descuentoPorc/100);
+
+  const totalConDescuento=totalFinal-descuentoAplicado;
+
+  const resultadoDiv=document.getElementById('resultado');
+  const filas=[
+    {label:'Subtotal', value: total},
+    {label:'Medición, envío y colocación', value: flete},
+    {label:'Trafóros', value: traforosTotal},
+    {label:'Total final', value: totalFinal, totales:true},
+    {label:'Descuento aplicado', value: descuentoAplicado},
+    {label:'Total con descuento', value: totalConDescuento, totales:true},
+  ];
+
+  resultadoDiv.innerHTML='';
+  filas.forEach((f,i)=>{
+    const div=document.createElement('div');
+    div.className='fila';
+    if(f.totales) div.classList.add('totales');
+    div.innerHTML=`<span>${f.label}</span><span>u$d${f.value.toFixed(2)}</span>`;
+    resultadoDiv.appendChild(div);
+  });
+}
+</script>
+
+</body>
+</html>
