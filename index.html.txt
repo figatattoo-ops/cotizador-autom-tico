@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cotizador Marmolería</title>
+</head>
+<body>
+
+<h1>Cotizador</h1>
+
+<h3>Material</h3>
+<input type="number" id="precioM2" placeholder="Precio por m²">
+
+<h3>Pieza</h3>
+<input type="text" id="nombre" placeholder="Nombre">
+<input type="number" id="largo" placeholder="Largo">
+<input type="number" id="ancho" placeholder="Ancho">
+
+<h3>Zócalos (metros lineales)</h3>
+<input type="number" id="zocalo">
+
+<h3>Regruesos (metros lineales)</h3>
+<input type="number" id="regrueso">
+
+<h3>Trafóros</h3>
+Grifería: <input type="number" id="grif">
+Bacha: <input type="number" id="bacha">
+Anafe: <input type="number" id="anafe">
+
+<br><br>
+<button onclick="calcular()">Calcular</button>
+
+<h2 id="resultado"></h2>
+
+<script src="app.js"></script>
+
+</body>
+</html>
